@@ -12,7 +12,7 @@ class Player:
 		self.hp = 100
 		self.gold = 5
 		self.victory = False
-		self.exp = 0
+		self.exp = 199
 		self.player_lvl = 1
 	def is_alive(self):
 		return self.hp > 0 
@@ -35,12 +35,14 @@ class Player:
 		for item in self.inventory:
 			print('* ' + str(item))
 		print("Gold: {}".format(self.gold))
-		
-	def check_if_level(self,new_exp):
-		new_exp = self.exp
-		if new_exp >= 400:
-			self.lvl = self.lvl + 1
 	
+	def check_lvl_up(self):
+		new_exp = self.exp + enemies.exp
+		self.player_lvl = current_level
+		if True:
+			levels = [0,200,450,1012]
+			current_level = sum(1 for x in levels if x<= total_exp)
+			current_level = self.player_lvl
 
 	def most_powerful_weapon(self):
 		max_damage = 0 

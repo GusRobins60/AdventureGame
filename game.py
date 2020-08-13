@@ -1,11 +1,13 @@
 from collections import OrderedDict
 from player import Player
 import world
-
+import sys
+import time
+import os
 
 def play():
-	
 	print("Escape the Cave of Terror!")
+	time.sleep(0.05)
 	world.parse_world_dsl()
 	player = Player()
 	while player.is_alive() and not player.victory:
@@ -58,5 +60,7 @@ def action_adder(action_dict,hotkey,action,name):
 	action_dict[hotkey.lower()] = action
 	action_dict[hotkey.upper()] = action
 	print("{}: {}".format(hotkey,name))
+	
+
 
 play()

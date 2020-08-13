@@ -1,6 +1,8 @@
 import enemies
 import npc
 import random
+import time
+
 
 
 class MapTile:
@@ -20,6 +22,7 @@ class StartTile(MapTile):
         You find yourself in a cave with a flickering torch on the wall.
         You can make out four paths, each equally as dark and foreboding.
         """
+        time.sleep(0.5)
 
 
 class EnemyTile(MapTile):
@@ -27,8 +30,9 @@ class EnemyTile(MapTile):
         r = random.random()
         if r < 0.50:
             self.enemy = enemies.GiantSpider()
-            self.alive_text = "A giant spider jumps down from " \
+            self.alive_text =  "A giant spider jumps down from " \
                               "its web in front of you!"
+                              
             self.dead_text = "The corpse of a dead spider " \
                              "rots on the ground."
         elif r < 0.80:
@@ -51,6 +55,7 @@ class EnemyTile(MapTile):
 
     def intro_text(self):
         text = self.alive_text if self.enemy.is_alive() else self.dead_text
+        time.sleep(0.1)
         return text
 
     def modify_player(self, player):
@@ -69,6 +74,7 @@ class EnemyTile(MapTile):
 class VictoryTile(MapTile):
     def modify_player(self,player):
     	player.victory = True
+    
     def intro_text(self):
         return """
         You see a bright light in the distance...
