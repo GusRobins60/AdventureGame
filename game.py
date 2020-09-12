@@ -36,6 +36,8 @@ def get_available_actions(room,player):
 	print("choose an Action: ")
 	if player.player_stats:
 		action_adder(actions, 'p',player.player_stats, "Print Stats")
+	if player.spell_book:
+		action_adder(actions, 'sb',player.print_spellbook,"Print Spell Book")
 	if player.inventory:
 		action_adder(actions, 'i',player.print_inventory,"Print Inventory")
 	if isinstance(room,world.TraderTile):
@@ -56,11 +58,13 @@ def get_available_actions(room,player):
 
 	return actions
 
+
 def action_adder(action_dict,hotkey,action,name):
 	action_dict[hotkey.lower()] = action
 	action_dict[hotkey.upper()] = action
 	print("{}: {}".format(hotkey,name))
-	
+
+
 
 
 play()
