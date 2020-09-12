@@ -1,12 +1,13 @@
 import items
 import world
 import enemies
+import magic
 
 class Player:
 	
 	def __init__(self):
 		self.inventory = [items.Dagger(),items.Rock(),items.CrustyBread()]
-
+		self.spell_book = [magic.magic_missle(), magic.fire_ball()]
 		self.x = world.start_tile_location[0]
 		self.y = world.start_tile_location[1]
 		self.hp = 100
@@ -14,7 +15,9 @@ class Player:
 		self.victory = False
 		self.exp = 199
 		self.player_lvl = 1
+		self.mana = 100
 	def is_alive(self):
+
 		return self.hp > 0 
 	def move(self,dx,dy):
 		self.x += dx
@@ -29,21 +32,26 @@ class Player:
 		self.move(dx=-1, dy=0)
 	def player_stats(self):
 		print("Level: {}".format(self.player_lvl), "HP: {}".format(self.hp),"Gold: {}".format(self.gold), "EXP: {}".format(self.exp))
+	def print_spellbook(self):
+		print('\n Spell Book')
+		for magic in self.spell_book:
+			print('*'+str(magic))
 
 	def print_inventory(self):
-		print("Inventory:")
+		print("\n Inventory:")
 		for item in self.inventory:
 			print('* ' + str(item))
 		print("Gold: {}".format(self.gold))
 	
-	def check_lvl_up(self):
-		new_exp = self.exp + enemies.exp
-		self.player_lvl = current_level
-		if True:
-			levels = [0,200,450,1012]
-			current_level = sum(1 for x in levels if x<= total_exp)
-			current_level = self.player_lvl
 
+	'''
+	def check_lvl_up(self,enemy):
+		new_exp = self.exp + enemy.exp
+		levels = [0,200,450,1012]
+		if True:
+			current_level = sum(1 for x in levels if x<= total_exp)
+			self.player_lvl = current_level
+	'''
 	def most_powerful_weapon(self):
 		max_damage = 0 
 		best_weapon = None
@@ -52,21 +60,54 @@ class Player:
 				if item.damage > max_damage:
 					best_weapon = item 
 					max_damage = item.damage
+					if self.player_lvl >= 2:
+						item.damage = item.damage + 1
+					self.stat_modifier()
 			except AttributeError:
 				pass
 
 		return best_weapon
 	def attack(self):
-		best_weapon = self.most_powerful_weapon()
-		room = world.tile_at(self.x,self.y)
-		enemy = room.enemy
-		print("You use {} against {}!".format(best_weapon.name,enemy.name))
+		spell = [magic for magic in self.spell_book if isinstance(magic,magic.Spell)]
+		if not spells:
+			print("You have no spells to cast!")
 		
-		enemy.hp -=  best_weapon.damage
-		if not enemy.is_alive():
-			print("You killed {}!".format(enemy.name))
-		else:
-			print("{} HP is {}.".format(enemy.name,enemy.hp))
+		input('What do you want to attack with? Melee or Magic: ')
+
+		if input == 'magic':
+			for i, magic in enumerate(spell, 1):
+				print('Choose a spell to cast:')
+				print(f"{i}. {spell}")
+			valid =False
+			while not valid:
+				choice = input("")
+				try:
+					room = world.tile_at(self.x,self.y)
+					enemy = room.enemy
+					print("You use {} against {}!".format(spell,enemy.name))
+					enemy.hp -=  spell.damage
+					self.mana = self.mana - spell.mana
+
+					if not enemy.is_alive():
+						print("You killed {}!".format(enemy.name))
+						
+					else:
+						print("{} HP is {}.".format(enemy.name,enemy.hp))
+				except(ValueError,IndexError):
+					print("Invalid choice, try again")
+
+		elif input == 'melee':
+			best_weapon = self.most_powerful_weapon()
+			room = world.tile_at(self.x,self.y)
+			enemy = room.enemy
+			print("You use {} against {}!".format(best_weapon.name,enemy.name))
+			enemy.hp -=  best_weapon.damage
+
+			if not enemy.is_alive():
+				print("You killed {}!".format(enemy.name))
+				
+			else:
+				print("{} HP is {}.".format(enemy.name,enemy.hp))
 
 	def heal(self):
 		consumables = [item for item in self.inventory if isinstance(item,items.Consumables)]
@@ -94,6 +135,10 @@ class Player:
 		room = world.tile_at(self.x,self.y)
 		room.check_if_trade(self)
 	
+	
+
+
+
 	
 
 
