@@ -9,7 +9,7 @@ class Spell:
 
 class magic_missle(Spell):
 	def __init__(self):
-		self.name = "Magic Missle"
+		self.name = "Magic Missile"
 		self.discription = "A bolt of condensed magical power that you fling at an opponent."
 		self.damage = 15
 		self.mana = 10
