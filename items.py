@@ -6,7 +6,15 @@ class Weapon:
 		
 	def __str__(self):
 		return self.name
+class Trap:
+	def __init__(self):
+		raise NotImplementedError("Do not create raw weapon objects.")
 
+	def __str__(self):
+		return self.name 
+	
+	def is_tripped(self):
+		return self.tripped == True
 
 class Consumables:
 	def __init__(self):
@@ -49,3 +57,13 @@ class HealingPotion(Consumables):
 		self.name = "Healing Potion"
 		self.healing_value = 50
 		self.value = 60
+class PitFall(Trap):
+	def __init__(self):
+		self.name = "Pit Fall"
+		self.damage = 10
+		self.is_tripped() = False
+class TripWire(Trap):
+	def __init__(self):
+		self.name = "Tripwire"
+		self.damage = 5
+		self.is_tripped() = False
