@@ -2,6 +2,9 @@ import enemies
 import npc
 import random
 import time
+import items
+
+
 
 
 
@@ -11,6 +14,7 @@ class MapTile:
         self.y = y
 
     def intro_text(self):
+      
         raise NotImplementedError("Create a subclass instead!")
 
     def modify_player(self, player): 
@@ -19,40 +23,42 @@ class MapTile:
 class StartTile(MapTile):
     def intro_text(self):
         return """
-        You find yourself in a cave with a flickering torch on the wall.
+        \n You find yourself in a cave with a flickering torch on the wall.
         You can make out four paths, each equally as dark and foreboding.
         """
         time.sleep(0.5)
 
 
 class EnemyTile(MapTile):
+    '''            
     def __init__(self, x, y):
+    
         r = random.random()
         if r < 0.50:
             self.enemy = enemies.GiantSpider()
-            self.alive_text =  "A giant spider jumps down from " \
+            self.alive_text =  "\nA giant spider jumps down from " \
                               "its web in front of you!"
                               
-            self.dead_text = "The corpse of a dead spider " \
+            self.dead_text = "\nThe corpse of a dead spider " \
                              "rots on the ground."
         elif r < 0.80:
             self.enemy = enemies.Ogre()
-            self.alive_text = "An ogre is blocking your path!"
-            self.dead_text = "A dead ogre reminds you of your triumph."
+            self.alive_text = "\n An ogre is blocking your path!"
+            self.dead_text = "\nA dead ogre reminds you of your triumph."
         elif r < 0.95:
             self.enemy = enemies.BatColony()
-            self.alive_text = "You hear a squeaking noise growing louder" \
+            self.alive_text = "\nYou hear a squeaking noise growing louder" \
                               "...suddenly you are lost in swarm of bats!"
-            self.dead_text = "Dozens of dead bats are scattered on the ground."
+            self.dead_text = "\nDozens of dead bats are scattered on the ground."
         else:
             self.enemy = enemies.RockMonster()
-            self.alive_text = "You've disturbed a rock monster " \
+            self.alive_text = "\nYou've disturbed a rock monster " \
                               "from his slumber!"
-            self.dead_text = "Defeated, the monster has reverted " \
+            self.dead_text = "\nDefeated, the monster has reverted " \
                              "into an ordinary rock."
-
+        
         super().__init__(x, y)
-
+    '''
     def intro_text(self):
         text = self.alive_text if self.enemy.is_alive() else self.dead_text
         time.sleep(0.1)
@@ -64,12 +70,44 @@ class EnemyTile(MapTile):
             print("Enemy does {} damage. You have {} HP remaining.".
                   format(self.enemy.damage, player.hp))
         if not self.enemy.is_alive():
-            player.exp = player.exp  + self.enemy.exp
             player.gold = player.gold + self.enemy.gold
-            if player.exp >= 400:
-                player.player_lvl = 2
             if self.enemy.gold == 0:
                 pass
+            player.exp = player.exp + self.enemy.exp
+            total_exp = player.exp
+            levels = [0,200,450,1012]
+            if True:
+                current_level = sum(1 for x in levels if x <= total_exp)
+                player.player_lvl = current_level
+        
+                if not self.enemy.is_alive():
+                    self.enemy.exp = 0
+
+class GoblinScoutTile(EnemyTile):
+    def __init__(self,x,y):
+        self.enemy = enemies.GoblinScout()
+        r = random.random()
+        if r < .20:
+            self.alive_text = "\nA small goblin jumps out at you its not much to look at..."\
+                                "Lookout its got a knife!"
+        elif r < 50:
+            self.alive_text = "\nOut of a dark recess in the wall jumps a goblin"\
+                                " ready to scewer you with his dagger"
+        else:
+            self.alive_text = "\nYou hear a gutteral voice out of the dark "\
+                                "walks a goblin ready for battle!"
+        self.dead_text = "\nA dead goblin body."
+
+        super().__init__(x, y)
+
+class GoblinBasherTile(EnemyTile):
+    def __init__(self,x,y):
+        self.enemy = enemies.GoblinBasher()
+        self.alive_text = "\nLookout a Goblin basher and he is looking for a fight."
+
+        self.dead_text = "\n The body of a dead Goblin basher"
+        super().__init__(x,y)
+
 
 class VictoryTile(MapTile):
     def modify_player(self,player):
@@ -104,6 +142,62 @@ class FindGoldTile(MapTile):
             return """
             Someone dropped some gold. You pick it up.
             """
+          
+class TrapRoomTile(MapTile):
+    def __init__(self, x, y):
+        r = random.randint(1,2)
+        if r == 1:
+            self.trap = items.PitFall()
+
+            self.tripped_text = "The open hole of a Pit Fall trap obstructs the tunnel."
+
+            self.set_text = "The floor in this hallway is unusually clean."
+
+        else:
+            return"""
+            Looks like more bare stone...
+            """
+        super().__init__(x, y)
+    
+    def modify_player(self,player):
+        if not self.trap.is_tripped():
+            player.hp = player.hp - self.items.damage
+            print("You stumbled into a trap!")
+            time.sleep(1)
+            print("\nTrap does {} damage. You have {} HP remaining.".
+                  format(self.items.damage, player.hp))
+    
+    def intro_text(self):
+        text = self.tripped_text if self.items.is_tripped() else self.set_text
+        time.sleep(0.1)
+        return text
+
+class EmptyRoomTile(MapTile):
+    def intro_text(self):
+        r = random.random()
+        if r < .10:
+            return"""
+            Rough hewn stone walls are all you can make out in the flickering tourch light.
+            """
+        elif r < .30:
+            return"""
+            There is nothing remarkable in this part of the tunnel keep moving onward!
+            """
+        elif r < .50:
+            return"""
+            The dirt in this part of th ecave is scuffed but otherise there is nothing
+            remarkable here. best push on.
+            """
+        elif r < 70:
+            return"""
+            You've been walking for a while without finding anyone or anything.
+            no sense in going back now better keep moving.
+            """
+        else:
+            return"""
+            Great more stone... Is that a breeze I feel better keep going.
+            """
+
 
 
 class TraderTile(MapTile):
@@ -161,9 +255,9 @@ class TraderTile(MapTile):
 world_dsl = """
 |EN|EN|VT|EN|EN|
 |EN|  |  |  |EN|
-|EN|FG|EN|  |TT|
+|EN|FG|GS|  |TT|
 |TT|  |ST|FG|EN|
-|FG|  |EN|  |FG|
+|FG|  |TR|  |FG|
 """
 
 
@@ -186,6 +280,10 @@ tile_type_dict = {"VT": VictoryTile,
                   "ST": StartTile,
                   "FG": FindGoldTile,
                   "TT": TraderTile,
+                  "GS": GoblinScoutTile,
+                  "GB": GoblinBasherTile,
+                  "ER": EmptyRoomTile,
+                  "TR":TrapRoomTile,
                   "  ": None}
 
 
@@ -221,3 +319,4 @@ def tile_at(x, y):
         return world_map[y][x]
     except IndexError:
         return None
+
