@@ -142,25 +142,25 @@ class FindGoldTile(MapTile):
             return """
             Someone dropped some gold. You pick it up.
             """
-          
+         
 class TrapRoomTile(MapTile):
     def __init__(self, x, y):
+        self.trap = items.Trap
         r = random.randint(1,2)
         if r == 1:
             self.trap = items.PitFall()
-
-            self.tripped_text = "The open hole of a Pit Fall trap obstructs the tunnel."
+            self.trap.tripped = True
 
             self.set_text = "The floor in this hallway is unusually clean."
+            time.sleep(1)
 
+            self.tripped_text = "The open hole of a Pit Fall trap obstructs the tunnel."
         else:
-            return"""
-            Looks like more bare stone...
-            """
+            self.set_text = "Looks like more bare stone... "
         super().__init__(x, y)
     
     def modify_player(self,player):
-        if not self.trap.is_tripped():
+        if self.trap.is_tripped():
             player.hp = player.hp - self.items.damage
             print("You stumbled into a trap!")
             time.sleep(1)
@@ -168,7 +168,7 @@ class TrapRoomTile(MapTile):
                   format(self.items.damage, player.hp))
     
     def intro_text(self):
-        text = self.tripped_text if self.items.is_tripped() else self.set_text
+        text = self.tripped_text if self.trap.is_tripped() else self.set_text
         time.sleep(0.1)
         return text
 
