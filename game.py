@@ -1,9 +1,5 @@
-from collections import OrderedDict
-from player import Player
-import world
-import sys
-import time
 import os
+import json
 
 def play():
 	print("Escape the Cave of Terror!")
@@ -19,6 +15,8 @@ def play():
 		elif not player.is_alive():
 			"Your Journy has come to an early end."
 
+
+
 def choose_action(room,player):
 	action = None
 	while not action:
@@ -32,8 +30,9 @@ def choose_action(room,player):
 
 
 def get_available_actions(room,player):
+	
 	actions = OrderedDict()
-	print("choose an Action: ")
+	print("\nchoose an Action: ")
 	if player.player_stats:
 		action_adder(actions, 'p',player.player_stats, "Print Stats")
 	if player.spell_book:
@@ -65,6 +64,5 @@ def action_adder(action_dict,hotkey,action,name):
 	print("{}: {}".format(hotkey,name))
 
 
-
-
 play()
+
