@@ -2,6 +2,7 @@ import items
 import world
 import enemies
 import magic
+import json
 
 class Player:
 	
@@ -31,7 +32,7 @@ class Player:
 	def move_west(self):
 		self.move(dx=-1, dy=0)
 	def player_stats(self):
-		print("Level: {}".format(self.player_lvl), "HP: {}".format(self.hp),"Gold: {}".format(self.gold), "EXP: {}".format(self.exp))
+		print("Level: {}".format(self.player_lvl), "HP: {}".format(self.hp),"Mana:{}".format(self.mana),"Gold: {}".format(self.gold), "EXP: {}".format(self.exp))
 	def print_spellbook(self):
 		print('\n Spell Book')
 		for magic in self.spell_book:
@@ -62,41 +63,45 @@ class Player:
 					max_damage = item.damage
 					if self.player_lvl >= 2:
 						item.damage = item.damage + 1
-					self.stat_modifier()
 			except AttributeError:
 				pass
 
 		return best_weapon
 	def attack(self):
-		spell = [magic for magic in self.spell_book if isinstance(magic,magic.Spell)]
-		if not spells:
+
+		spell = [magic_spell for magic_spell in self.spell_book if isinstance(magic_spell,magic.Spell)]
+		if not spell:
 			print("You have no spells to cast!")
 		
-		input('What do you want to attack with? Melee or Magic: ')
-
-		if input == 'magic':
-			for i, magic in enumerate(spell, 1):
-				print('Choose a spell to cast:')
-				print(f"{i}. {spell}")
+		user_input = input('What do you want to attack with? melee or magic: ')
+	
+		if user_input == 'magic':
+			for i, magic_spell in enumerate(spell, 1):
+				print("Choose a spell to cast: ")
+				print("{}. {}".format(i,magic_spell))
+			
 			valid =False
 			while not valid:
 				choice = input("")
 				try:
-					room = world.tile_at(self.x,self.y)
-					enemy = room.enemy
-					print("You use {} against {}!".format(spell,enemy.name))
-					enemy.hp -=  spell.damage
-					self.mana = self.mana - spell.mana
+					if self.mana == 0:
+						print("You dont have enough mana")
+					else:	
+						room = world.tile_at(self.x,self.y)
+						enemy = room.enemy
+						print("You use {} against {}!".format(magic_spell,enemy.name))
+						enemy.hp -= magic_spell.damage
+						self.mana = self.mana - magic_spell.mana
 
-					if not enemy.is_alive():
-						print("You killed {}!".format(enemy.name))
-						
-					else:
-						print("{} HP is {}.".format(enemy.name,enemy.hp))
+						if not enemy.is_alive():
+							print("You killed {}!".format(enemy.name))
+							
+						else:
+							print("{} HP is {}.".format(enemy.name,enemy.hp))
 				except(ValueError,IndexError):
-					print("Invalid choice, try again")
-
-		elif input == 'melee':
+					print("Invalid choice, try again")	
+				break
+		elif user_input == 'melee':
 			best_weapon = self.most_powerful_weapon()
 			room = world.tile_at(self.x,self.y)
 			enemy = room.enemy
@@ -135,10 +140,18 @@ class Player:
 		room = world.tile_at(self.x,self.y)
 		room.check_if_trade(self)
 	
-	
+	def current_locaton(self):
+		room = world.tile_at(self.x,self.y)
+		self.current_location = room
 
-
-
-	
-
-
+	def saveload(self):
+		player_Stats = {
+			self.player.hp,
+			self.player.gold,
+			self.player.lvl,
+			self.player.current_location(),
+		}
+		filename = 'save.json'
+		with open(filename, 'w') as f:
+			json.dump(player_Stats)
+		
