@@ -67,8 +67,8 @@ class EnemyTile(MapTile):
     def modify_player(self, player):
         if self.enemy.is_alive():
             player.hp = player.hp - self.enemy.damage
-            print("Enemy does {} damage. You have {} HP remaining.".
-                  format(self.enemy.damage, player.hp))
+            print("{} does {} damage. You have {} HP remaining.".
+                  format(self.enemy.name,self.enemy.damage, player.hp))
         if not self.enemy.is_alive():
             player.gold = player.gold + self.enemy.gold
             if self.enemy.gold == 0:
@@ -82,6 +82,33 @@ class EnemyTile(MapTile):
         
                 if not self.enemy.is_alive():
                     self.enemy.exp = 0
+class CaveMonster(EnemyTile):
+    def __init__(self,x,y):
+        r = random.randint(1,4)
+        if r == 1:
+            self.enemy = enemies.GiantRat()
+            self.alive_text = "\nLook at that ROUS whats out it has sharp teeth."
+            self.dead_text = "\nA body of a dead rat"
+        elif r == 2:
+            self.enemy = enemies.GiantSpider()
+            self.alive_text =  "\nA giant spider jumps down from " \
+                              "its web in front of you!"
+                              
+            self.dead_text = "\nThe corpse of a dead spider " \
+                             "rots on the ground."
+        elif r == 3:
+            self.enemy = enemies.BatColony()
+            self.alive_text = "\nYou hear a squeaking noise growing louder" \
+                              "...suddenly you are lost in swarm of bats!"
+            self.dead_text = "\nDozens of dead bats are scattered on the ground."
+        else:
+            self.enemy = enemies.RockMonster()
+            self.alive_text = "\nYou've disturbed a rock monster " \
+                              "from his slumber!"
+            self.dead_text = "\nDefeated, the monster has reverted " \
+                             "into an ordinary rock."
+        
+        super().__init__(x, y)
 
 class GoblinScoutTile(EnemyTile):
     def __init__(self,x,y):
@@ -108,18 +135,23 @@ class GoblinBasherTile(EnemyTile):
         self.dead_text = "\n The body of a dead Goblin basher"
         super().__init__(x,y)
 
-
+class KoboldTile(EnemyTile):
+    def __init__(self,x,y):
+        self.enemy = enemies.Kobold()
+        self.alive_text = "\nlook out a kobold harmless one at a time but deadly in groups or to"\
+                            " and unsuspecting adventurer"
+        self.dead_text = "\nThe dead body of a kobold"
+        super().__init__(x,y)
 class VictoryTile(MapTile):
     def modify_player(self,player):
     	player.victory = True
     
     def intro_text(self):
         return """
-        You see a bright light in the distance...
+        \nYou see a bright light in the distance...
         ... it grows as you get closer! It's sunlight!
         Victory is yours!
         """
-
 
 class FindGoldTile(MapTile):
     def __init__(self, x, y):
@@ -150,22 +182,25 @@ class TrapRoomTile(MapTile):
         if r == 1:
             self.trap = items.PitFall()
             self.trap.tripped = True
-
-            self.set_text = "The floor in this hallway is unusually clean."
+            
+            self.set_text = "\nThe floor in this hallway is unusually clean."
             time.sleep(1)
-
-            self.tripped_text = "The open hole of a Pit Fall trap obstructs the tunnel."
+           
+            self.tripped_text = "\nA pitfall trap opens in the tunnel."
         else:
-            self.set_text = "Looks like more bare stone... "
+            self.is_tripped = False
+            self.set_text = "\nLooks like more bare stone... "
+
+            self.tripped_text = "\nThere is a large hole in the hallway."
         super().__init__(x, y)
     
     def modify_player(self,player):
         if self.trap.is_tripped():
-            player.hp = player.hp - self.items.damage
+            player.hp = player.hp - self.trap.damage
             print("You stumbled into a trap!")
             time.sleep(1)
             print("\nTrap does {} damage. You have {} HP remaining.".
-                  format(self.items.damage, player.hp))
+                  format(self.trap.damage, player.hp))
     
     def intro_text(self):
         text = self.tripped_text if self.trap.is_tripped() else self.set_text
@@ -199,6 +234,45 @@ class EmptyRoomTile(MapTile):
             """
 
 
+class WindObelisk(MapTile):
+    def __init__(self,x,y):
+        self.obelisk = npc.WindMagicObelisk()
+        super().__init__(x,y)
+
+    def check_if_learn_spell(self,player):
+        while True:
+            print('would ou like to (L)earn this spell? Or leave the obelisk alone (q)')
+            user_input = input()
+            if user_input in ['Q','q']:
+                return
+            elif user_input in ['L','l']:
+                print("You can learn these spells")
+                self.trade(buyer=player,seller=self.obelisk)
+            else:
+                print("invalid choice")
+    def learn_spell(self,buyer,seller):
+        for i,spell in enumerate(seller.spell_book,1):
+            print("{}. {}".format(i,spell.name))
+        while True:
+            user_input = input("Choose a spell to learn: ")
+            if user_input in ['Q','q']:
+                return
+            else:
+                try:
+                    choice = int(user_input)
+                    to_swap = seller.spell_book[choice - 1]
+                    self.swap(seller,buyer,to_swap)
+                except ValueError:
+                    print("Invalid choice!")
+    def swap(self,seller,buyer,spell):
+        seller.spell_book.remove(spell)
+        buyer.spell_book.append(spell)
+        print("you learned the Spell")    
+    def intro_text(self):
+        return"""
+        You find a large strangly illuminated rock obelisk that gives off the 
+        feeling of a light breeze mixed with a magical sensation.
+        """
 
 class TraderTile(MapTile):
     def __init__(self, x, y):
@@ -253,11 +327,25 @@ class TraderTile(MapTile):
         """
 
 world_dsl = """
-|EN|EN|VT|EN|EN|
-|EN|  |  |  |EN|
-|EN|FG|GS|  |TT|
-|TT|  |ST|FG|EN|
-|FG|  |TR|  |FG|
+|ST|WO|TR|ER|CM|  |ER|ER|ER|  |  |ER|  |  |ER|  |  |  |ER|ER|ER|
+|CM|  |  |  |ER|  |FG|  |ER|  |FG|ER|ER|ER|KT|ER|CM|  |FG|  |CM|
+|ER|FG|GS|  |TT|  |  |  |ER|  |  |ER|  |  |  |  |ER|  |  |ER|ER|
+|TT|  |ER|KT|CM|ER|CM|ER|GB|  |  |ER|  |  |ER|  |ER|ER|ER|ER|  |
+|FG|  |TR|  |FG|  |  |  |ER|GS|ER|KT|ER|GB|TT|ER|CM|  |  |ER|ER|
+|ER|GS|ER|  |ER|  |  |  |ER|  |  |ER|  |ER|  |  |ER|  |  |  |ER|
+|  |ER|  |ER|TT|TR|KT|ER|CM|  |ER|ER|  |ER|  |ER|ER|  |ER|ER|ER|
+|  |ER|  |GB|  |  |ER|  |ER|TT|ER|  |ER|GS|ER|ER|  |  |ER|  |  |
+|TR|ER|  |ER|GS|  |CM|  |  |ER|  |  |ER|  |  |ER|  |ER|ER|ER|ER|
+|ER|  |  |  |TR|  |ER|ER|ER|GS|ER|ER|ER|  |  |ER|  |ER|  |  |  |
+|ER|ER|ER|  |ER|  |ER|  |  |  |  |ER|  |  |ER|TT|ER|ER|ER|  |ER|
+|  |  |ER|TT|ER|GS|ER|  |ER|FG|ER|ER|ER|ER|  |ER|  |ER|ER|ER|  |
+|FG|  |  |ER|  |ER|  |  |  |ER|ER|  |ER|  |  |  |ER|  |  |  |ER|
+|ER|ER|ER|ER|ER|ER|  |ER|  |ER|  |  |ER|ER|ER|TT|ER|ER|  |  |ER|
+|ER|  |  |  |  |ER|ER|TT|ER|ER|ER|  |  |  |  |ER|  |ER|ER|ER|TR|
+|CM|ER|TT|ER|TR|  |  |ER|  |ER|  |ER|ER|TR|  |ER|  |  |ER|  |ER|
+|  |  |ER|  |ER|ER|  |ER|ER|CM|ER|ER|  |ER|ER|CM|ER|  |ER|  |ER|
+|ER|  |ER|  |  |ER|  |  |ER|  |  |  |  |ER|  |  |ER|ER|ER|ER|ER|
+|ER|ER|CM|ER|  |ER|ER|ER|ER|ER|  |  |  |ER|ER|ER|  |  |VT|  |  |
 """
 
 
@@ -283,7 +371,10 @@ tile_type_dict = {"VT": VictoryTile,
                   "GS": GoblinScoutTile,
                   "GB": GoblinBasherTile,
                   "ER": EmptyRoomTile,
-                  "TR":TrapRoomTile,
+                  "TR": TrapRoomTile,
+                  "KT": KoboldTile,
+                  "CM": CaveMonster,
+                  "WO": WindObelisk,
                   "  ": None}
 
 
