@@ -9,7 +9,7 @@ class Spell:
 
 class magic_missle(Spell):
 	def __init__(self):
-		self.name = "Magic Missile"
+		self.name = "Magic Missle"
 		self.discription = "A bolt of condensed magical power that you fling at an opponent."
 		self.damage = 15
 		self.mana = 10
@@ -20,4 +20,19 @@ class fire_ball(Spell):
 		self.discription = "A ball of fire that explodes on impact."
 		self.damage = 20
 		self.mana = 15
+
+class Wind_Bolt(Spell):
+	def __init__(self):
+		self.name = 'Wind Bolt'
+		self.disription = "A compressed bolt of air directed at you enemy."
+		self.damage = 25
+		self.mana = 20 
+
+class Gust(Spell):
+	def __init__(self):
+		self.name = 'Gust'
+		self.discription = "Heavy gust of wind that damages enemeies"
+		self.damage = 5
+		self.mana = 5
+
 
