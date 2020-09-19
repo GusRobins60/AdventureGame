@@ -7,7 +7,7 @@ import json
 class Player:
 	
 	def __init__(self):
-		self.inventory = [items.Dagger(),items.Rock(),items.CrustyBread()]
+		self.inventory = [items.Dagger(),items.Rock(),items.CrustyBread(),items.ManaPotion()]
 		self.spell_book = [magic.magic_missle(), magic.fire_ball()]
 		self.x = world.start_tile_location[0]
 		self.y = world.start_tile_location[1]
@@ -16,7 +16,7 @@ class Player:
 		self.victory = False
 		self.exp = 199
 		self.player_lvl = 1
-		self.mana = 100
+		self.mp = 100
 	def is_alive(self):
 
 		return self.hp > 0 
@@ -32,7 +32,7 @@ class Player:
 	def move_west(self):
 		self.move(dx=-1, dy=0)
 	def player_stats(self):
-		print("Level: {}".format(self.player_lvl), "HP: {}".format(self.hp),"Mana:{}".format(self.mana),"Gold: {}".format(self.gold), "EXP: {}".format(self.exp))
+		print("Level: {}".format(self.player_lvl), "HP: {}".format(self.hp),"Mana:{}".format(self.mp),"Gold: {}".format(self.gold), "EXP: {}".format(self.exp))
 	def print_spellbook(self):
 		print('\n Spell Book')
 		for magic in self.spell_book:
@@ -53,6 +53,8 @@ class Player:
 			current_level = sum(1 for x in levels if x<= total_exp)
 			self.player_lvl = current_level
 	'''
+	def learn_magic(self):
+		pass
 	def most_powerful_weapon(self):
 		max_damage = 0 
 		best_weapon = None
@@ -63,6 +65,10 @@ class Player:
 					max_damage = item.damage
 					if self.player_lvl >= 2:
 						item.damage = item.damage + 1
+						spell.damage += 1
+					elif self.player_lvl >= 3:
+						item.damage = item.damage + 2
+						spell.damage += 2
 			except AttributeError:
 				pass
 
@@ -71,13 +77,14 @@ class Player:
 
 		spell = [magic_spell for magic_spell in self.spell_book if isinstance(magic_spell,magic.Spell)]
 		if not spell:
-			print("You have no spells to cast!")
+			print("\nYou have no spells to cast!")
 		
-		user_input = input('What do you want to attack with? melee or magic: ')
+		user_input = input('\nWhat do you want to attack with? melee or magic: ')
 	
 		if user_input == 'magic':
+			print("\nChoose a spell to cast: ")
 			for i, magic_spell in enumerate(spell, 1):
-				print("Choose a spell to cast: ")
+				
 				print("{}. {}".format(i,magic_spell))
 			
 			valid =False
@@ -89,12 +96,12 @@ class Player:
 					else:	
 						room = world.tile_at(self.x,self.y)
 						enemy = room.enemy
-						print("You use {} against {}!".format(magic_spell,enemy.name))
+						print("\nYou use {} against {}!".format(magic_spell,enemy.name))
 						enemy.hp -= magic_spell.damage
-						self.mana = self.mana - magic_spell.mana
+						self.mp = self.mp - magic_spell.mana
 
 						if not enemy.is_alive():
-							print("You killed {}!".format(enemy.name))
+							print("\nYou killed {}!".format(enemy.name))
 							
 						else:
 							print("{} HP is {}.".format(enemy.name,enemy.hp))
@@ -135,7 +142,30 @@ class Player:
 				valid = True
 			except (ValueError,IndexError):
 				print("Invalid choice, try again")
+	def mana(self):
+		restore_mana = [item for item in self.inventory if isinstance(item,items.ManaRestore)]
+		if not restore_mana:
+			print("You dont have anything to restore mana")
+			return
+		for i,item in enumerate(restore_mana,1):
+			print("choose an item to restore mana.")
+			print("{}. {}".format(i, item))
 
+		valid = False
+		while not valid:
+			choice = input("")
+			try:
+				to_restore = restore_mana[int(choice)-1]
+				self.mp = min(100,self.mp + to_restore.mana_value)
+				self.inventory.remove(to_restore)
+				print("Current MP: {}".format(self.mp))
+				valid = True
+			except (ValueError, IndexError):
+				print("invalid choice, try again")
+	def learn_magic(self):
+		room = world.tile_at(self.x,self.y)
+		room.check_if_learn_spell(self)
+		
 	def trade(self):
 		room = world.tile_at(self.x,self.y)
 		room.check_if_trade(self)
