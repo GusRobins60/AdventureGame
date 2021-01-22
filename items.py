@@ -62,18 +62,29 @@ class HealingPotion(Consumables):
 		self.name = "Healing Potion"
 		self.healing_value = 50
 		self.value = 60
+<<<<<<< HEAD
 class ManaPotion(ManaRestore):
 	def __init__(self):
 		self.name = "Mana Potion"
 		self.mana_value = 50 
 		self.value = 45
+=======
+>>>>>>> 45bf0b496c1d4f59d90e5c29989043ba435b2ac7
 class PitFall(Trap):
 	def __init__(self):
 		self.name = "Pit Fall"
 		self.damage = 10
+<<<<<<< HEAD
 		
+=======
+		self.is_tripped() = False
+>>>>>>> 45bf0b496c1d4f59d90e5c29989043ba435b2ac7
 class TripWire(Trap):
 	def __init__(self):
 		self.name = "Tripwire"
 		self.damage = 5
+<<<<<<< HEAD
 	
+=======
+		self.is_tripped() = False
+>>>>>>> 45bf0b496c1d4f59d90e5c29989043ba435b2ac7

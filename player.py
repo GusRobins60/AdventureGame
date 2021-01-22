@@ -184,4 +184,8 @@ class Player:
 		filename = 'save.json'
 		with open(filename, 'w') as f:
 			json.dump(player_Stats)
+<<<<<<< HEAD
 		
+=======
+		
+>>>>>>> 45bf0b496c1d4f59d90e5c29989043ba435b2ac7

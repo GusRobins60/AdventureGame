@@ -60,6 +60,7 @@ class GoblinBasher(Enemy):
 		self.gold = 15
 		self.exp = random.randint(10,20)
 
+<<<<<<< HEAD
 class Kobold(Enemy):
 	def __init__(self):
 		self.name = "Kobold"
@@ -74,3 +75,5 @@ class GiantRat(Enemy):
 		self.damage = random.randint(1,5)
 		self.gold = 0
 		self.exp = random.randint(5,10)
+=======
+>>>>>>> 45bf0b496c1d4f59d90e5c29989043ba435b2ac7

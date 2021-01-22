@@ -59,7 +59,11 @@ class EnemyTile(MapTile):
         
         super().__init__(x, y)
     '''
+<<<<<<< HEAD
     def intro_text(self,player):
+=======
+    def intro_text(self):
+>>>>>>> 45bf0b496c1d4f59d90e5c29989043ba435b2ac7
         text = self.alive_text if self.enemy.is_alive() else self.dead_text
         '''
         text = txt
@@ -96,7 +100,11 @@ class CaveMonster(EnemyTile):
         r = random.randint(1,4)
         if r == 1:
             self.enemy = enemies.GiantRat()
+<<<<<<< HEAD
             self.alive_text = "\nLook at that R.O.U.S whats out it has sharp teeth."
+=======
+            self.alive_text = "\nLook at that ROUS whats out it has sharp teeth."
+>>>>>>> 45bf0b496c1d4f59d90e5c29989043ba435b2ac7
             self.dead_text = "\nA body of a dead rat"
         elif r == 2:
             self.enemy = enemies.GiantSpider()
@@ -133,17 +141,27 @@ class GoblinScoutTile(EnemyTile):
             self.alive_text = "\nYou hear a gutteral voice out of the dark "\
                                 "walks a goblin ready for battle!"
         self.dead_text = "\nA dead goblin body."
+<<<<<<< HEAD
 
         super().__init__(x, y)
 
+=======
+
+        super().__init__(x, y)
+
+>>>>>>> 45bf0b496c1d4f59d90e5c29989043ba435b2ac7
 class GoblinBasherTile(EnemyTile):
     def __init__(self,x,y):
         self.enemy = enemies.GoblinBasher()
         self.alive_text = "\nLookout a Goblin basher and he is looking for a fight."
 
+<<<<<<< HEAD
         self.combat_text = "\nGoblin Basher flinches back from the attack"
 
         self.dead_text = "\nThe body of a dead Goblin basher"
+=======
+        self.dead_text = "\n The body of a dead Goblin basher"
+>>>>>>> 45bf0b496c1d4f59d90e5c29989043ba435b2ac7
         super().__init__(x,y)
 
 class KoboldTile(EnemyTile):
@@ -243,7 +261,50 @@ class EmptyRoomTile(MapTile):
             return"""
             Great more stone... Is that a breeze I feel better keep going.
             """
+<<<<<<< HEAD
 
+=======
+>>>>>>> 45bf0b496c1d4f59d90e5c29989043ba435b2ac7
+
+class WindObelisk(MapTile):
+    def __init__(self,x,y):
+        self.obelisk = npc.WindMagicObelisk()
+        super().__init__(x,y)
+
+    def check_if_learn_spell(self,player):
+        while True:
+            print('would ou like to (L)earn this spell? Or leave the obelisk alone (q)')
+            user_input = input()
+            if user_input in ['Q','q']:
+                return
+            elif user_input in ['L','l']:
+                print("You can learn these spells")
+                self.trade(buyer=player,seller=self.obelisk)
+            else:
+                print("invalid choice")
+    def learn_spell(self,buyer,seller):
+        for i,spell in enumerate(seller.spell_book,1):
+            print("{}. {}".format(i,spell.name))
+        while True:
+            user_input = input("Choose a spell to learn: ")
+            if user_input in ['Q','q']:
+                return
+            else:
+                try:
+                    choice = int(user_input)
+                    to_swap = seller.spell_book[choice - 1]
+                    self.swap(seller,buyer,to_swap)
+                except ValueError:
+                    print("Invalid choice!")
+    def swap(self,seller,buyer,spell):
+        seller.spell_book.remove(spell)
+        buyer.spell_book.append(spell)
+        print("you learned the Spell")    
+    def intro_text(self):
+        return"""
+        You find a large strangly illuminated rock obelisk that gives off the 
+        feeling of a light breeze mixed with a magical sensation.
+        """
 
 class WindObelisk(MapTile):
     def __init__(self,x,y):
@@ -338,7 +399,11 @@ class TraderTile(MapTile):
         """
 
 world_dsl = """
+<<<<<<< HEAD
 |ST|GB|TR|ER|CM|  |ER|ER|ER|  |  |ER|  |  |ER|  |  |  |ER|ER|ER|
+=======
+|ST|WO|TR|ER|CM|  |ER|ER|ER|  |  |ER|  |  |ER|  |  |  |ER|ER|ER|
+>>>>>>> 45bf0b496c1d4f59d90e5c29989043ba435b2ac7
 |CM|  |  |  |ER|  |FG|  |ER|  |FG|ER|ER|ER|KT|ER|CM|  |FG|  |CM|
 |ER|FG|GS|  |TT|  |  |  |ER|  |  |ER|  |  |  |  |ER|  |  |ER|ER|
 |TT|  |ER|KT|CM|ER|CM|ER|GB|  |  |ER|  |  |ER|  |ER|ER|ER|ER|  |

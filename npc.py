@@ -17,4 +17,8 @@ class Trader(NonPlayerCharacter):
 class WindMagicObelisk(NonPlayerCharacter):
 	def __init__(self):
 		self.name = "obelisk"
+<<<<<<< HEAD
 		self.spell_book = [magic.Wind_Bolt(), magic.Gust()]		
+=======
+		self.spell_book = [magic.Wind_Bolt(), magic.Gust()]		
+>>>>>>> 45bf0b496c1d4f59d90e5c29989043ba435b2ac7
