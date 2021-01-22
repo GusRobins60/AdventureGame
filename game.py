@@ -4,10 +4,10 @@ import world
 import sys
 import time
 import os
+import json
 
 def play():
 	print("Escape the Cave of Terror!")
-	time.sleep(0.05)
 	world.parse_world_dsl()
 	player = Player()
 	while player.is_alive() and not player.victory:
@@ -18,6 +18,8 @@ def play():
 			choose_action(room,player)
 		elif not player.is_alive():
 			"Your Journy has come to an early end."
+
+
 
 def choose_action(room,player):
 	action = None
@@ -32,10 +34,13 @@ def choose_action(room,player):
 
 
 def get_available_actions(room,player):
+	
 	actions = OrderedDict()
-	print("choose an Action: ")
+	print("\nchoose an Action: ")
 	if player.player_stats:
 		action_adder(actions, 'p',player.player_stats, "Print Stats")
+	if player.spell_book:
+		action_adder(actions, 'sb',player.print_spellbook,"Print Spell Book")
 	if player.inventory:
 		action_adder(actions, 'i',player.print_inventory,"Print Inventory")
 	if isinstance(room,world.TraderTile):
@@ -53,14 +58,17 @@ def get_available_actions(room,player):
 			action_adder(actions,'w',player.move_west,"Go West")
 	if player.hp <100:
 		action_adder(actions,'h',player.heal,"Heal")
+	if player.mp <100:
+		action_adder(actions, 'r', player.mana, "Restore Mana")
 
 	return actions
+
 
 def action_adder(action_dict,hotkey,action,name):
 	action_dict[hotkey.lower()] = action
 	action_dict[hotkey.upper()] = action
 	print("{}: {}".format(hotkey,name))
-	
 
 
 play()
+

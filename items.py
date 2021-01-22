@@ -6,7 +6,15 @@ class Weapon:
 		
 	def __str__(self):
 		return self.name
+class Trap:
+	def __init__(self):
+		raise NotImplementedError("Do not create raw weapon objects.")
 
+	def __str__(self):
+		return self.name 
+	
+	def is_tripped(self):
+		return self.tripped == True
 
 class Consumables:
 	def __init__(self):
@@ -14,7 +22,12 @@ class Consumables:
 
 	def __str__(self):
 		return "{} (+{} HP)".format(self.name, self.healing_value)
+class ManaRestore:
+	def __init__(self):
+		raise NotImplementedError("Do not create raw Mana restore objects")
 
+	def __str__(self):
+		return "{} (+{} MP)".format(self.name, self.mana_value)
 class CrustyBread(Consumables):
 	def __init__(self):
 		self.name = "Crusty Bread"
@@ -49,3 +62,18 @@ class HealingPotion(Consumables):
 		self.name = "Healing Potion"
 		self.healing_value = 50
 		self.value = 60
+class ManaPotion(ManaRestore):
+	def __init__(self):
+		self.name = "Mana Potion"
+		self.mana_value = 50 
+		self.value = 45
+class PitFall(Trap):
+	def __init__(self):
+		self.name = "Pit Fall"
+		self.damage = 10
+		
+class TripWire(Trap):
+	def __init__(self):
+		self.name = "Tripwire"
+		self.damage = 5
+	
